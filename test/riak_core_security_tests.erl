@@ -10,8 +10,9 @@ start_manager(Node) ->
         0 -> exit(no_dir); %% make sure we don't do something stupid below
         _ -> ok
     end,
-    os:cmd("mkdir " ++ Dir),
-    os:cmd("rm -rf " ++ Dir ++ "/"),
+    % Clean up any leftover directory and lock files from previous runs
+    os:cmd("rm -rf " ++ Dir),
+    os:cmd("mkdir -p " ++ Dir),
     {ok, Mgr} = riak_core_metadata_manager:start_link([{data_dir, Dir},
                                                        {node_name, Node}]),
     TreeDir = Dir ++ "/trees",
@@ -22,12 +23,15 @@ start_manager(Node) ->
     unlink(Mgr),
 
     application:set_env(riak_core, permissions, [{riak_kv,[get,put]}]),
-    {Mgr, Tree, Bcst}.
+    {Mgr, Tree, Bcst, Dir}.
 
-stop_manager({Mgr, Tree, Bcst}) ->
+stop_manager({Mgr, Tree, Bcst, Dir}) ->
     catch exit(Mgr, kill),
     catch exit(Tree, kill),
     catch exit(Bcst, kill),
+    % Clean up test directory after stopping processes
+    timer:sleep(100),  % Give processes time to release locks
+    os:cmd("rm -rf " ++ Dir),
     ok.
 
 security_test_() ->
