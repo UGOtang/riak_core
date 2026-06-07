@@ -64,8 +64,7 @@
 
 -include("riak_core_vnode.hrl").
 
--behaviour(gen_fsm).
-
+%% gen_fsm behaviour (deprecated in OTP 27+, but still functional)
 -compile({nowarn_deprecated_function, 
             [{gen_fsm, start_link, 3},
                 {gen_fsm, start_timer, 2}]}).

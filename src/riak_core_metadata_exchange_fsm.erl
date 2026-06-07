@@ -19,8 +19,7 @@
 %% -------------------------------------------------------------------
 -module(riak_core_metadata_exchange_fsm).
 
--behaviour(gen_fsm).
-
+%% gen_fsm behaviour (deprecated in OTP 27+, but still functional)
 -compile({nowarn_deprecated_function, 
             [{gen_fsm, start, 3},
                 {gen_fsm, send_event, 2}]}).
